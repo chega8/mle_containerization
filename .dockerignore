@@ -1,0 +1,12 @@
+env/
+data/
+models/
+notebooks/
+src/__pycache__
+.ipynb_checkpoints/
+
+.git
+.gitignore
+.idea
+.vscode
+README.md

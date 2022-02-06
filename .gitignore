@@ -1,0 +1,12 @@
+!.gitkeep
+
+env/
+data/
+models/
+volume/
+
+src/__pycache__
+.ipynb_checkpoints/
+
+.idea
+.vscode
