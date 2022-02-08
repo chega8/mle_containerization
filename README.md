@@ -31,6 +31,6 @@ We will use Linear regression from sklearn to predict target variable.
 
 To see how it works:
 
-- Put the `train.csv` file with training data
+- Put the `train.csv` file with training data to `volume/`
 - (In terminal) train the model: `python src/train.py volume/train.csv `
 - You will see `/volume/logreg.pkl` and `volume/scaler.pkl` - the result artifacts after training model.
