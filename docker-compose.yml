@@ -1,0 +1,12 @@
+version: "3.7"
+
+services:
+   app:
+    image: logreg
+    container_name: logreg_cont
+    stdin_open: true
+    tty: true
+    working_dir: /home/logreg
+    volumes:
+        - ./volume:/home/logreg/volume/
+    

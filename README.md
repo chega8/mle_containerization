@@ -23,14 +23,11 @@ We will use Linear regression from sklearn to predict target variable.
 
 ## Run container
 
-`docker run --name=logreg -dti -v volume:/home/logreg/volume/ logreg`
+`docker-compose up -d && docker attach logreg_cont`
 
-## Use container terminal
-
-`docker exec -ti logreg bash`
 
 To see how it works:
 
 - Put the `train.csv` file with training data to `volume/`
-- (In terminal) train the model: `python src/train.py volume/train.csv `
+- (In terminal) train the model: `python src/train.py volume/train.csv`
 - You will see `/volume/logreg.pkl` and `volume/scaler.pkl` - the result artifacts after training model.
