@@ -1,0 +1,11 @@
+prepare:
+  split: 0.20
+  seed: 20170428
+
+featurize:
+  max_features: 200
+
+train:
+  seed: 20170428
+  l2: 0.01
+  l1: 0.01

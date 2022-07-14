@@ -17,17 +17,19 @@ Data contains 286 features and 1kk rows but we will use only 100k for training.
 ## Model
 We will use Linear regression from sklearn to predict target variable.
 
-## Build container
+## Build and run container
 
-`docker build -t logreg .`
-
+`docker-compose build && docker-compose up -d`
+<!-- 
 ## Run container
 
-`docker-compose up -d && docker attach logreg_cont`
+`docker-compose up -d && docker attach logreg_cont` -->
 
 
-To see how it works:
+Run experiment:
 
-- Put the `train.csv` file with training data to `volume/`
+<!-- - Put the `train.csv` file with training data to `volume/`
 - (In terminal) train the model: `python src/train.py volume/train.csv`
-- You will see `/volume/logreg.pkl` and `volume/scaler.pkl` - the result artifacts after training model.
+- You will see `/volume/logreg.pkl` and `volume/scaler.pkl` - the result artifacts after training model. -->
+- `dvc repro`
+- `data/models/logreg.pkl`, `data/models/scaler.pkl` - the result.

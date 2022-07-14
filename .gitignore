@@ -2,6 +2,7 @@
 
 env/
 models/
+static
 
 src/__pycache__
 .ipynb_checkpoints/

@@ -1,0 +1,57 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: docker exec -ti logreg_cont ./src/scripts/prepare.sh
+    deps:
+    - path: data/train_sample.csv
+      md5: 728ac1ea5b92660fa0d823cf6f5c742d
+      size: 233124604
+    - path: src/prepare.py
+      md5: 1fb85a7d0afd3d92ff371a8393e6a7aa
+      size: 2051
+    params:
+      params.yaml:
+        prepare.seed: 20170428
+        prepare.split: 0.2
+    outs:
+    - path: data/prepared
+      md5: e09591164df50c1817589b6981b7b26e.dir
+      size: 183979748
+      nfiles: 2
+  featurize:
+    cmd: docker exec -ti logreg_cont ./src/scripts/featurize.sh
+    deps:
+    - path: data/prepared
+      md5: e09591164df50c1817589b6981b7b26e.dir
+      size: 183979748
+      nfiles: 2
+    - path: src/featurize.py
+      md5: 4fdfc00258a4de8b10d3a89248d615ad
+      size: 2770
+    params:
+      params.yaml:
+        featurize.max_features: 200
+    outs:
+    - path: data/features
+      md5: 7ea967dd2ecedb352853140b461963d2.dir
+      size: 80400636
+      nfiles: 4
+  train:
+    cmd: docker exec -ti logreg_cont ./src/scripts/train.sh
+    deps:
+    - path: data/features
+      md5: 7ea967dd2ecedb352853140b461963d2.dir
+      size: 80400636
+      nfiles: 4
+    - path: src/train.py
+      md5: 840c5d31f7edde9df7f38638a269b66e
+      size: 1926
+    params:
+      params.yaml:
+        train.l1: 0.01
+        train.l2: 0.01
+        train.seed: 20170428
+    outs:
+    - path: data/models/logreg.pkl
+      md5: 56284971721b8b66b2f623b1f9a08bcf
+      size: 2441

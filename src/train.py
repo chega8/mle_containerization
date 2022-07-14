@@ -1,39 +1,34 @@
-import sys
-
-import time
-
 from loguru import logger
-
+from sklearn import metrics, model_selection
+import argparse
+import os
+import time
+import random
+import sys
 from sklearn.linear_model import LogisticRegression
-from sklearn import model_selection
-from sklearn import metrics
+import yaml
 
 sys.path.append('./')
 
-import click
+from src.utils import format_time, load_pickle, save_model, load_data, save_pickle, load_features
 
-from src.utils import compress_dataset, scaler, format_time, load_data, save_model
 
-@click.command()
-@click.argument('train_path')
-def train(train_path: str):
-    train_df = load_data(train_path)
-    logger.info(f"train data loaded from {train_path}")
+params = yaml.safe_load(open("params.yaml"))["train"]
 
-    TARGET = 'target'
-    FEATURES = [col for col in train_df.columns if col not in ['id', TARGET]]
+l2 = params["l2"]
+l1 = params["l1"]
+random.seed(params["seed"])
 
-    train_df["mean"] = train_df[FEATURES].mean(axis=1)
-    train_df["std"] = train_df[FEATURES].std(axis=1)
-    train_df["min"] = train_df[FEATURES].min(axis=1)
-    train_df["max"] = train_df[FEATURES].max(axis=1)
+def train(features_path: str):
+    """Train the model on features
 
-    FEATURES.extend(['mean', 'max', 'min', 'max'])
-
-    train_df = compress_dataset(train_df)
-
-    X, Y = scaler(train_df, FEATURES, TARGET)
-    logger.info("Data preprocessing completed")
+    Args:
+        features_path (str): path to features
+    """
+    x = load_pickle(os.path.join(features_path, "train.pkl"))
+    y = load_pickle(os.path.join(features_path, "train_target.pkl"))
+    
+    logger.info(f"Features loaded from {features_path}")
 
     models = [
         [LogisticRegression, {}, 'logreg']
@@ -44,9 +39,9 @@ def train(train_path: str):
 
     skfolds = model_selection.StratifiedKFold(n_splits=N_FOLDS, shuffle=False)
 
-    for fold, (t, v) in enumerate(skfolds.split(X, Y)):
-        x_train, x_val = X[t], X[v]
-        y_train, y_val = Y[t], Y[v]
+    for fold, (t, v) in enumerate(skfolds.split(x, y)):
+        x_train, x_val = x[t], x[v]
+        y_train, y_val = y[t], y[v]
         
         for class_name, class_params, name in models:
             tic = time.time()
@@ -59,7 +54,7 @@ def train(train_path: str):
             logger.info(f"MODEL: {name}\tSCORE: {score}\tTIME: {format_time(time.time()-tic)}\tFOLD: {fold}")
             
         del x_train, x_val, y_train, y_val
-            
+    
     logger.info(f'TOTAL TIME: {format_time(time.time() - start)}')
 
     save_model(clf, 'logreg')
@@ -67,4 +62,8 @@ def train(train_path: str):
 
 
 if __name__ == "__main__":
-    train()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('features_path', type=str, help='path to features')
+    args = parser.parse_args()
+    
+    train(args.features_path)

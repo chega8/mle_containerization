@@ -1,0 +1,31 @@
+stages:
+  prepare:
+    cmd: docker exec -ti logreg_cont ./src/scripts/prepare.sh
+    deps:
+    - data/train_sample.csv
+    - src/prepare.py
+    params:
+    - prepare.seed
+    - prepare.split
+    outs:
+    - data/prepared
+  featurize:
+    cmd: docker exec -ti logreg_cont ./src/scripts/featurize.sh
+    deps:
+    - data/prepared
+    - src/featurize.py
+    params:
+    - featurize.max_features
+    outs:
+    - data/features
+  train:
+    cmd: docker exec -ti logreg_cont ./src/scripts/train.sh
+    deps:
+    - data/features
+    - src/train.py
+    params:
+    - train.l1
+    - train.l2
+    - train.seed
+    outs:
+    - data/models/logreg.pkl
