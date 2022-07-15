@@ -57,6 +57,7 @@ def train(features_path: str):
     
     logger.info(f'TOTAL TIME: {format_time(time.time() - start)}')
 
+    os.makedirs('data/models', exist_ok=True)
     save_model(clf, 'logreg')
     logger.info(f"Model saved")
 

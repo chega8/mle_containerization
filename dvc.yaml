@@ -1,6 +1,6 @@
 stages:
   prepare:
-    cmd: docker exec -ti logreg_cont ./src/scripts/prepare.sh
+    cmd: ./src/scripts/prepare.sh
     deps:
     - data/train_sample.csv
     - src/prepare.py
@@ -10,7 +10,7 @@ stages:
     outs:
     - data/prepared
   featurize:
-    cmd: docker exec -ti logreg_cont ./src/scripts/featurize.sh
+    cmd: ./src/scripts/featurize.sh
     deps:
     - data/prepared
     - src/featurize.py
@@ -19,7 +19,7 @@ stages:
     outs:
     - data/features
   train:
-    cmd: docker exec -ti logreg_cont ./src/scripts/train.sh
+    cmd: ./src/scripts/train.sh
     deps:
     - data/features
     - src/train.py
@@ -28,4 +28,4 @@ stages:
     - train.l2
     - train.seed
     outs:
-    - data/models/logreg.pkl
+    - data/models

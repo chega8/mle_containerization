@@ -1,2 +1,2 @@
 #!/bin/bash
-python src/train.py data/features
+docker exec --workdir /home/logreg -ti logreg_cont python src/train.py data/features
