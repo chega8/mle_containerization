@@ -29,3 +29,20 @@ stages:
     - train.seed
     outs:
     - data/models
+  evaluate:
+    cmd: ./src/scripts/evaluate.sh
+    deps:
+    - data/features
+    - data/models/logreg.pkl
+    - src/evaluate.py
+    metrics:
+    - evaluation.json:
+        cache: false
+    plots:
+    - evaluation/importance.png
+    - evaluation/plots/confusion_matrix.json:
+        cache: false
+    - evaluation/plots/precision_recall.json:
+        cache: false
+    - evaluation/plots/roc.json:
+        cache: false

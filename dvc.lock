@@ -15,37 +15,37 @@ stages:
         prepare.split: 0.2
     outs:
     - path: data/prepared
-      md5: 05141f28b08e85e718799571513f2804.dir
+      md5: 54b808d2fa1d47e0c0a257ecc2fa8cba.dir
       size: 183979748
       nfiles: 2
   featurize:
     cmd: ./src/scripts/featurize.sh
     deps:
     - path: data/prepared
-      md5: 05141f28b08e85e718799571513f2804.dir
+      md5: 54b808d2fa1d47e0c0a257ecc2fa8cba.dir
       size: 183979748
       nfiles: 2
     - path: src/featurize.py
-      md5: 4fdfc00258a4de8b10d3a89248d615ad
-      size: 2770
+      md5: c94336c825ff52e3e2188f20598c7223
+      size: 2785
     params:
       params.yaml:
         featurize.max_features: 200
     outs:
     - path: data/features
-      md5: 9ea9041c576f45709bf6387769333d96.dir
-      size: 80400636
-      nfiles: 4
+      md5: 1f5a1d7e69e542461bb2f80c1cd789a6.dir
+      size: 80401121
+      nfiles: 5
   train:
     cmd: ./src/scripts/train.sh
     deps:
     - path: data/features
-      md5: 9ea9041c576f45709bf6387769333d96.dir
-      size: 80400636
-      nfiles: 4
+      md5: 1f5a1d7e69e542461bb2f80c1cd789a6.dir
+      size: 80401121
+      nfiles: 5
     - path: src/train.py
-      md5: ec808d6d3f58a0f0829ca0ec51f110b4
-      size: 1938
+      md5: 64898630b9fbe3aac7170afb743113a5
+      size: 1899
     params:
       params.yaml:
         train.l1: 0.01
@@ -53,6 +53,35 @@ stages:
         train.seed: 20170428
     outs:
     - path: data/models
-      md5: f9eb73670bc01f036965ca977b498696.dir
-      size: 2441
+      md5: 40b5d3a5c80bc530dfa114f956fe4338.dir
+      size: 2303
       nfiles: 1
+  evaluate:
+    cmd: ./src/scripts/evaluate.sh
+    deps:
+    - path: data/features
+      md5: 1f5a1d7e69e542461bb2f80c1cd789a6.dir
+      size: 80401121
+      nfiles: 5
+    - path: data/models/logreg.pkl
+      md5: f7c18035158e74fbac9116df7b0941f2
+      size: 2303
+    - path: src/evaluate.py
+      md5: 8afaf59f8ac17db2a153855d015e7b81
+      size: 2398
+    outs:
+    - path: evaluation.json
+      md5: 6dffd28d5e24e549ee2fdb89de535b28
+      size: 73
+    - path: evaluation/importance.png
+      md5: 85144909d6c706ef11321d223e96e2aa
+      size: 22290
+    - path: evaluation/plots/confusion_matrix.json
+      md5: 5b4530cc91318a0bdabeccf438791b0f
+      size: 1260002
+    - path: evaluation/plots/precision_recall.json
+      md5: c2b9dd03016ccaf37e41f944e05b804c
+      size: 152023
+    - path: evaluation/plots/roc.json
+      md5: bb7d32b976f8f55aff13ebd98cc0f146
+      size: 948670
