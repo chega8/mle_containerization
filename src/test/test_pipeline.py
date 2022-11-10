@@ -30,3 +30,8 @@ def test_featurization():
 
     features, scaler = scale_prepared(prepared_test, scaler, "none")
     assert np.linalg.norm(features) == 282891213.48606616
+
+
+def test_prepare():
+    """Test prepare"""
+    assert True
