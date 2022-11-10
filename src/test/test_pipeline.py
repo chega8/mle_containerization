@@ -35,3 +35,8 @@ def test_featurization():
 def test_prepare():
     """Test prepare"""
     assert True
+
+
+def test_evaluate():
+    """Test evaluate"""
+    assert True
