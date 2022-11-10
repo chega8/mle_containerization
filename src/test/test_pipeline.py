@@ -40,3 +40,8 @@ def test_prepare():
 def test_evaluate():
     """Test evaluate"""
     assert True
+
+
+def test_train():
+    """Test train"""
+    assert True
