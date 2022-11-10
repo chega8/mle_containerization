@@ -1,20 +1,51 @@
-from loguru import logger
-from sklearn import preprocessing
-import numpy as np
+"""Featurize step"""
+
 import argparse
 import os
 import sys
+from typing import Tuple
 import yaml
+
+from pandas import DataFrame
+
+from loguru import logger
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+
 
 sys.path.append("./")
 
-from src.utils import save_model, load_data, save_pickle
+from src.utils import load_data, save_pickle
 
-"""Feturize step of the pipeline"""
 
 params = yaml.safe_load(open("params.yaml"))["featurize"]
 
 MAX_FEATURES = params["max_features"]
+
+
+def read_prepared(train_pth: str, test_pth: str) -> Tuple[DataFrame, DataFrame]:
+    """Read prepared test and train data"""
+
+    prepared_train = load_data(train_pth)
+    prepared_test = load_data(test_pth)
+    return prepared_train, prepared_test
+
+
+def scale_prepared(
+    data: DataFrame, scaler: StandardScaler, mode: str = "train"
+) -> Tuple[np.ndarray, StandardScaler]:
+    """Scale prepared data"""
+
+    if mode == "train":
+        data = scaler.fit_transform(data.to_numpy())
+    elif mode == "test":
+        data = scaler.transform(data.to_numpy())
+    else:
+        logger.error(f"Unsupported mode type: {mode}, select 'train' or 'test'")
+        return data.to_numpy(), scaler
+
+    features = data.astype(np.float32)
+    return features, scaler
 
 
 def fearurize(prepared_path: str, output_dir: str):
@@ -36,40 +67,31 @@ def fearurize(prepared_path: str, output_dir: str):
 
     scaler_path = os.path.join(output_dir, "scaler.pkl")
 
-    prepared_train = load_data(train_input)
-    prepared_test = load_data(test_input)
+    prepared_train, prepared_test = read_prepared(train_input, test_input)
 
     logger.info(f"Prepared data loaded from {prepared_path}")
-    logger.info(f"Featurization...")
+    logger.info("Featurization...")
 
-    scaler = preprocessing.StandardScaler()
-
-    TARGET = "target"
-    FEATURES = [col for col in prepared_train.columns if col not in ["id", TARGET]][
+    target = "target"
+    features = [col for col in prepared_train.columns if col not in ["id", target]][
         :MAX_FEATURES
     ]
 
+    scaler = StandardScaler()
+
     # Transform train and test features
-    for col in FEATURES:
-        prepared_train[col] = scaler.fit_transform(
-            prepared_train[col].to_numpy().reshape(-1, 1)
-        )
-        prepared_test[col] = scaler.transform(
-            prepared_test[col].to_numpy().reshape(-1, 1)
-        )
+    features_train, scaler = scale_prepared(prepared_train[features], scaler)
+    features_test, scaler = scale_prepared(prepared_test[features], scaler)
 
-    features_train = prepared_train[FEATURES].to_numpy().astype(np.float32)
-    train_target = prepared_train[TARGET].to_numpy().astype(np.float32)
-
-    features_test = prepared_test[FEATURES].to_numpy().astype(np.float32)
-    test_target = prepared_test[TARGET].to_numpy().astype(np.float32)
+    train_target = prepared_train[target].to_numpy().astype(np.float32)
+    test_target = prepared_test[target].to_numpy().astype(np.float32)
 
     # Save scaler
     os.makedirs(output_dir, exist_ok=True)
 
-    save_pickle(scaler, scaler_path)
     logger.info("Featurization completed")
 
+    save_pickle(scaler, scaler_path)
     # Save features
     save_pickle(features_train, train_output)
     save_pickle(train_target, train_output_target)
@@ -77,7 +99,7 @@ def fearurize(prepared_path: str, output_dir: str):
     save_pickle(features_test, test_output)
     save_pickle(test_target, test_output_target)
 
-    logger.info(f"Features saved in {output_dir}")
+    logger.info(f"features saved in {output_dir}")
 
 
 if __name__ == "__main__":

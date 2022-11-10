@@ -1,16 +1,15 @@
-from loguru import logger
-from sklearn.model_selection import train_test_split
+"""Prepare step"""
+
 import sys
 import os
 import random
 import argparse
 import yaml
+from loguru import logger
+from sklearn.model_selection import train_test_split
 
 sys.path.append("./")
-
 from src.utils import load_data, compress_dataset
-
-"""Prepare step of the pipeline"""
 
 params = yaml.safe_load(open("params.yaml"))["prepare"]
 
@@ -31,22 +30,22 @@ def prepare(raw_data_path: str, output_dir: str):
 
     raw_df = load_data(raw_data_path)
     logger.info(f"Raw data loaded from {raw_data_path}")
-    logger.info(f"Preparing raw data...")
+    logger.info("Preparing raw data...")
 
-    TARGET = "target"
-    FEATURES = [col for col in raw_df.columns if col not in ["id", TARGET]]
+    target = "target"
+    features = [col for col in raw_df.columns if col not in ["id", target]]
 
-    raw_df["mean"] = raw_df[FEATURES].mean(axis=1)
-    raw_df["std"] = raw_df[FEATURES].std(axis=1)
-    raw_df["min"] = raw_df[FEATURES].min(axis=1)
-    raw_df["max"] = raw_df[FEATURES].max(axis=1)
+    raw_df["mean"] = raw_df[features].mean(axis=1)
+    raw_df["std"] = raw_df[features].std(axis=1)
+    raw_df["min"] = raw_df[features].min(axis=1)
+    raw_df["max"] = raw_df[features].max(axis=1)
 
-    FEATURES.extend(["mean", "max", "min", "max"])
+    features.extend(["mean", "max", "min", "max"])
 
     raw_df = compress_dataset(raw_df)
 
     train_df, test_df, train_target, test_target = train_test_split(
-        raw_df[FEATURES], raw_df[TARGET], test_size=split
+        raw_df[features], raw_df[target], test_size=split
     )
     logger.info("Preparing completed")
 

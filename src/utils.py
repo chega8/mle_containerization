@@ -1,10 +1,14 @@
-import pickle
-from typing import Any
-from loguru import logger
-import pandas as pd
-import numpy as np
+"""Utils"""
+
 import os
 
+from typing import Any
+import pickle
+
+import pandas as pd
+import numpy as np
+
+from loguru import logger
 
 INT8_MIN = np.iinfo(np.int8).min
 INT8_MAX = np.iinfo(np.int8).max
@@ -63,16 +67,17 @@ def format_time(seconds):
 
 
 def memory_usage(data):
+    """Shows memory usage"""
     memory = data.memory_usage().sum() / (1024 * 1024)
     print("Memory usage : {0:.2f}MB".format(memory))
     return memory
 
 
 def compress_dataset(data):
+    """Compress data using less precision number formats"""
     memory_before_compress = memory_usage(data)
     print()
 
-    # print('=' * length_interval)
     for col in data.columns:
         col_dtype = data[col][:100].dtype
 
@@ -89,9 +94,6 @@ def compress_dataset(data):
                 else:
                     pass
 
-                # memory_after_compress = memory_usage(data)
-                # print("Compress Rate: [{0:.2%}]".format((memory_before_compress-memory_after_compress) / memory_before_compress))
-
             if col_dtype == "int64":
                 if (col_min > INT8_MIN / 2) and (col_max < INT8_MAX / 2):
                     data[col] = data[col].astype(np.int8)
@@ -101,9 +103,6 @@ def compress_dataset(data):
                     data[col] = data[col].astype(np.int32)
                 else:
                     pass
-
-                # memory_after_compress = memory_usage(data)
-                # print("Compress Rate: [{0:.2%}]".format((memory_before_compress-memory_after_compress) / memory_before_compress))
 
     print()
     memory_after_compress = memory_usage(data)
@@ -118,6 +117,7 @@ def compress_dataset(data):
 
 @logger.catch
 def load_data(pth: str) -> pd.DataFrame:
+    """Load csv data"""
     if not os.path.isfile(pth):
         raise FileExistsError
 
@@ -125,18 +125,22 @@ def load_data(pth: str) -> pd.DataFrame:
 
 
 def save_pickle(data: Any, path: str):
+    """Save data as pickle"""
     with open(path, "wb") as f:
         pickle.dump(data, f)
 
 
 def load_pickle(path: str) -> Any:
+    """Load pickle data"""
     with open(path, "rb") as f:
         return pickle.load(f)
 
 
 def save_model(model, name):
+    """Save model"""
     save_pickle(model, f"data/models/{name}.pkl")
 
 
 def load_model(name):
+    """Load model"""
     return load_pickle(f"data/models/{name}.pkl")

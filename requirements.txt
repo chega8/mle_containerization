@@ -1,6 +1,6 @@
 numpy
 pandas
-sklearn
+scikit-learn
 loguru
 pyyaml
 dvc[all]
@@ -8,3 +8,6 @@ dvc[s3]
 dvclive
 black
 black[jupyter]
+pytest
+pylint
+matplotlib

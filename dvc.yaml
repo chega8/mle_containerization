@@ -35,14 +35,14 @@ stages:
     - data/features
     - data/models/logreg.pkl
     - src/evaluate.py
-    metrics:
-    - evaluation.json:
+    outs:
+    - evaluation/plots/metrics:
         cache: false
     plots:
     - evaluation/importance.png
-    - evaluation/plots/confusion_matrix.json:
+    - evaluation/plots/sklearn/confusion_matrix.json:
         cache: false
-    - evaluation/plots/precision_recall.json:
+    - evaluation/plots/sklearn/precision_recall.json:
         cache: false
-    - evaluation/plots/roc.json:
+    - evaluation/plots/sklearn/roc.json:
         cache: false
