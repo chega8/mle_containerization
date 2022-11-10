@@ -45,7 +45,7 @@ def prepare(raw_data_path: str, output_dir: str):
     raw_df = compress_dataset(raw_df)
 
     train_df, test_df, train_target, test_target = train_test_split(
-        raw_df[features], raw_df[target], test_size=split
+        raw_df[features], raw_df[target], test_size=split, random_state=params["seed"]
     )
     logger.info("Preparing completed")
 

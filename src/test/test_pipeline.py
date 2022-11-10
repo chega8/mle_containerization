@@ -1,7 +1,7 @@
 """Test pipeline"""
 
 import sys
-
+import pytest
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 
@@ -11,6 +11,7 @@ sys.path.append("./")
 from src.featurize import read_prepared, scale_prepared
 
 
+@pytest.mark.skip
 def test_featurization():
     """Test featurization"""
 
