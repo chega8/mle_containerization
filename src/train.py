@@ -1,12 +1,18 @@
-from loguru import logger
-from sklearn import metrics, model_selection
+"""Train model"""
+
 import argparse
 import os
 import time
 import random
 import sys
-from sklearn.linear_model import LogisticRegression
 import yaml
+
+import numpy as np
+
+from loguru import logger
+from sklearn import metrics, model_selection
+
+from sklearn.linear_model import LogisticRegression
 
 sys.path.append("./")
 
@@ -19,28 +25,17 @@ l2 = params["l2"]
 l1 = params["l1"]
 random.seed(params["seed"])
 
+N_FOLDS = 5
 
-def train(features_path: str):
-    """Train the model on features
 
-    Args:
-        features_path (str): path to features
-    """
-    x = load_pickle(os.path.join(features_path, "train.pkl"))
-    y = load_pickle(os.path.join(features_path, "train_target.pkl"))
-
-    logger.info(f"Features loaded from {features_path}")
-
+def crossval_train(features: np.ndarray, target: np.ndarray):
+    """Train model and estimate cross-val scores"""
     models = [[LogisticRegression, {}, "logreg"]]
-
-    N_FOLDS = 5
-    start = time.time()
-
     skfolds = model_selection.StratifiedKFold(n_splits=N_FOLDS, shuffle=False)
 
-    for fold, (t, v) in enumerate(skfolds.split(x, y)):
-        x_train, x_val = x[t], x[v]
-        y_train, y_val = y[t], y[v]
+    for fold, (t, v) in enumerate(skfolds.split(features, target)):
+        x_train, x_val = features[t], features[v]
+        y_train, y_val = target[t], target[v]
 
         for class_name, class_params, name in models:
             tic = time.time()
@@ -56,11 +51,27 @@ def train(features_path: str):
 
         del x_train, x_val, y_train, y_val
 
+    return clf
+
+
+def train(features_path: str):
+    """Train the model on features
+
+    Args:
+        features_path (str): path to features
+    """
+    features = load_pickle(os.path.join(features_path, "train.pkl"))
+    target = load_pickle(os.path.join(features_path, "train_target.pkl"))
+
+    logger.info(f"Features loaded from {features_path}")
+
+    start = time.time()
+    model = crossval_train(features, target)
     logger.info(f"TOTAL TIME: {format_time(time.time() - start)}")
 
     os.makedirs("data/models", exist_ok=True)
-    save_model(clf, "logreg")
-    logger.info(f"Model saved")
+    save_model(model, "logreg")
+    logger.info("Model saved")
 
 
 if __name__ == "__main__":

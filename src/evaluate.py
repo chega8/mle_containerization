@@ -1,13 +1,18 @@
-from loguru import logger
+"""Evaluation"""
 import argparse
 import os
 import sys
-from sklearn import metrics
-import math
-import matplotlib.pyplot as plt
-import pandas as pd
-from dvclive import Live
 import json
+import math
+
+import pandas as pd
+
+from sklearn import metrics
+
+import matplotlib.pyplot as plt
+
+from dvclive import Live
+
 
 sys.path.append("./")
 
@@ -24,22 +29,24 @@ def evaluate(model_path: str, features_path: str):
         features_path (str): path to test featuers
     """
 
-    x = load_pickle(os.path.join(features_path, "test.pkl"))
-    y = load_pickle(os.path.join(features_path, "test_target.pkl"))
+    features = load_pickle(os.path.join(features_path, "test.pkl"))
+    target = load_pickle(os.path.join(features_path, "test_target.pkl"))
 
     model = load_pickle(model_path)
 
-    predictions_by_class = model.predict_proba(x)
+    predictions_by_class = model.predict_proba(features)
     predictions = predictions_by_class[:, 1]
 
-    live.log_plot("roc", y, predictions)
-    live.log("avg_prec", metrics.average_precision_score(y, predictions))
-    live.log("roc_auc", metrics.roc_auc_score(y, predictions))
+    live.log_sklearn_plot("roc", target, predictions)
+    live.log_metric("avg_prec", metrics.average_precision_score(target, predictions))
+    live.log_metric("roc_auc", metrics.roc_auc_score(target, predictions))
 
-    precision, recall, prc_thresholds = metrics.precision_recall_curve(y, predictions)
+    precision, recall, prc_thresholds = metrics.precision_recall_curve(
+        target, predictions
+    )
     nth_point = math.ceil(len(prc_thresholds) / 1000)
     prc_points = list(zip(precision, recall, prc_thresholds))[::nth_point]
-    prc_file = os.path.join("evaluation", "plots", "precision_recall.json")
+    prc_file = os.path.join("evaluation", "plots", "sklearn", "precision_recall.json")
     os.makedirs(os.path.join("evaluation", "plots"), exist_ok=True)
     with open(prc_file, "w") as fd:
         json.dump(
@@ -54,7 +61,9 @@ def evaluate(model_path: str, features_path: str):
         )
 
     # ... confusion matrix plot
-    live.log_plot("confusion_matrix", y.squeeze(), predictions_by_class.argmax(-1))
+    live.log_sklearn_plot(
+        "confusion_matrix", target.squeeze(), predictions_by_class.argmax(-1)
+    )
 
     # ... and finally, we can dump an image, it's also supported:
     fig, axes = plt.subplots(dpi=100)
