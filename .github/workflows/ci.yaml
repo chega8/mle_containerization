@@ -1,31 +1,52 @@
 name: ci
-on: [push]
+on:
+  push:
+    branches:
+      - main
+
+env:
+  APP_NAME: hw2
+
 jobs:
-  run:
+  test:
+    name: Test
     runs-on: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: rickstaa/action-black@v1
+        with:
+          black_args: ". --check"
+      - name: Init
+        run: pip install -r requirements.txt
+      - name: lint
+        run: python lint.py --path ./src
+      - name: Test
+        run: pytest src/test
+    
+  build:
+    name: Build
+    needs: test
+    runs-on: ubuntu-latest
     container: docker://dvcorg/cml-py3:latest
     steps:
       - uses: actions/checkout@v2
+        with:
+            repo_token: ${{ secrets.GITHUB_TOKEN }}
       - name: 'ci run'
-      env:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-      run:
-        # Install requirements
-        pip install -r requirements.txt
+        run:
+          # Pull data & run-cache from IBM COS and reproduce pipeline
+          dvc pull --run-cache
+          dvc repro
 
-        # Pull data & run-cache from IBM COS and reproduce pipeline
-        dvc pull --run-cache
-        dvc repro
+          echo "## Metrics" >> report.md
+          git fetch --prune
+          dvc metrics diff master --show-md >> report.md
 
-        # Report metrics
-        echo "## Metrics" >> report.md
-        git fetch --prune
-        dvc metrics diff master --show-md >> report.md
-
-        # Publish ROC Curve and 
-        echo -e "## Plots\n### ROC Curve" >> report.md
-        cml-publish ./results/roc_curve.png --md >> report.md
-        echo -e "\n### Precision and Recall Curve" >> report.md
-        cml-publish ./results/precision_recall_curve.png --md >> report.md
-        cml-send-comment report.md
+          echo -e "## Plots\n### ROC Curve" >> report.md
+          cml-publish ./results/roc_curve.png --md >> report.md
+          echo -e "\n### Precision and Recall Curve" >> report.md
+          cml-publish ./results/precision_recall_curve.png --md >> report.md
+          cml-send-comment report.md
       
