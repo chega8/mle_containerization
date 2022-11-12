@@ -35,14 +35,24 @@ stages:
     - data/features
     - data/models/logreg.pkl
     - src/evaluate.py
-    outs:
-    - evaluation/plots/metrics:
+    
+    metrics:
+    - evaluation/plots/metrics/avg_prec.tsv:
+        cache: false
+    - evaluation/plots/metrics/roc_auc.tsv:
         cache: false
     plots:
     - evaluation/importance.png
     - evaluation/plots/sklearn/confusion_matrix.json:
         cache: false
+        template: confusion
+        x: actual
+        y: predicted
     - evaluation/plots/sklearn/precision_recall.json:
         cache: false
+        x: recall
+        y: precision
     - evaluation/plots/sklearn/roc.json:
         cache: false
+        x: fpr
+        y: tpr

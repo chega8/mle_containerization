@@ -3,9 +3,9 @@ prepare:
   seed: 20170428
 
 featurize:
-  max_features: 200
+  max_features: 204
 
 train:
-  seed: 20170428
+  seed: 421
   l2: 0.01
   l1: 0.01

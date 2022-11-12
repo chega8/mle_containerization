@@ -38,27 +38,9 @@ def evaluate(model_path: str, features_path: str):
     predictions = predictions_by_class[:, 1]
 
     live.log_sklearn_plot("roc", target, predictions)
+    live.log_sklearn_plot("precision_recall", target, predictions)
     live.log_metric("avg_prec", metrics.average_precision_score(target, predictions))
     live.log_metric("roc_auc", metrics.roc_auc_score(target, predictions))
-
-    precision, recall, prc_thresholds = metrics.precision_recall_curve(
-        target, predictions
-    )
-    nth_point = math.ceil(len(prc_thresholds) / 1000)
-    prc_points = list(zip(precision, recall, prc_thresholds))[::nth_point]
-    prc_file = os.path.join("evaluation", "plots", "sklearn", "precision_recall.json")
-    os.makedirs(os.path.join("evaluation", "plots"), exist_ok=True)
-    with open(prc_file, "w") as fd:
-        json.dump(
-            {
-                "prc": [
-                    {"precision": p, "recall": r, "threshold": t}
-                    for p, r, t in prc_points
-                ]
-            },
-            fd,
-            indent=4,
-        )
 
     # ... confusion matrix plot
     live.log_sklearn_plot(
