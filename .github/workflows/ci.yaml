@@ -15,12 +15,13 @@ jobs:
       - uses: actions/checkout@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          python-version: 3.7
+          python-version: 3.9
       - uses: rickstaa/action-black@v1
         with:
           black_args: ". --check"
       - name: Init
         run:
+          pip3 install -U pip
           pip install --upgrade pip setuptools wheel
           pip install pygit2
           pip install -r requirements.txt
