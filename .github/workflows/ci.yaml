@@ -19,7 +19,9 @@ jobs:
         with:
           black_args: ". --check"
       - name: Init
-        run: pip install -r requirements.txt
+        run:
+          pip install --upgrade pip
+          pip install -r requirements.txt
       - name: lint
         run: python lint.py --path ./src
       - name: Test
