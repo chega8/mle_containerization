@@ -20,7 +20,7 @@ jobs:
           black_args: ". --check"
       - name: Init
         run:
-          pip install --upgrade pip
+          pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
       - name: lint
         run: python lint.py --path ./src
