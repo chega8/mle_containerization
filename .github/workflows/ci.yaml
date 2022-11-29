@@ -31,8 +31,8 @@ jobs:
       - uses: rickstaa/action-black@v1
         with:
           black_args: ". --check"
-      - name: lint
-        run: python3 lint.py --path ./src
+      - name: Lint
+        run: python lint.py --path ./src
       - name: Test
         run: pytest src/test
     
