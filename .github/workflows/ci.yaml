@@ -35,17 +35,7 @@ jobs:
         run: poetry run python ./lint.py --path ./src
       - name: Test
         run: poetry run pytest src/test
-    
-  build:
-    name: Build
-    needs: test
-    runs-on: ubuntu-latest
-    container: docker://dvcorg/cml-py3:latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-            repo_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: 'ci run'
+      - name: repro_exp
         run:
           dvc pull --run-cache
           dvc repro
@@ -57,4 +47,27 @@ jobs:
           echo -e "## Plots\n### ROC Curve" >> report.md
           dvc plots show >> report.md
           cml-send-comment report.md
+      
+    
+  # build:
+  #   name: Build
+  #   needs: test
+  #   runs-on: ubuntu-latest
+  #   container: docker://dvcorg/cml-py3:latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #       with:
+  #           repo_token: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: 'ci run'
+  #       run:
+  #         dvc pull --run-cache
+  #         dvc repro
+
+  #         echo "## Metrics" >> report.md
+  #         git fetch --prune
+  #         dvc metrics diff --show-md >> report.md
+
+  #         echo -e "## Plots\n### ROC Curve" >> report.md
+  #         dvc plots show >> report.md
+  #         cml-send-comment report.md
       
