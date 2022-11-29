@@ -9,7 +9,6 @@ stages:
     - path: src/prepare.py
       md5: 766923fb803898cfa1e01869b0427558
       size: 2040
-      isexec: true
     params:
       params.yaml:
         prepare.seed: 20170428
@@ -29,7 +28,6 @@ stages:
     - path: src/featurize.py
       md5: 73337a677c3055c5f1f8acdd30e70700
       size: 3310
-      isexec: true
     params:
       params.yaml:
         featurize.max_features: 204
@@ -48,7 +46,6 @@ stages:
     - path: src/train.py
       md5: dc7cbd484e3a3a42fe53e41159b75d72
       size: 2133
-      isexec: true
     params:
       params.yaml:
         train.l1: 0.01
