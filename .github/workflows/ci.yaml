@@ -43,7 +43,7 @@ jobs:
           aws-region: us-east-1
       - name: repro_exp
         run:
-          poetry run dvc pull -v
+          poetry run "dvc pull --run-cache"
           poetry run dvc repro
 
           echo "## Metrics" >> report.md
