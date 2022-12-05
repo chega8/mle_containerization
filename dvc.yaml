@@ -8,7 +8,8 @@ stages:
     - prepare.seed
     - prepare.split
     outs:
-    - data/prepared
+    - data/prepared:
+        cache: false
   featurize:
     cmd: ./src/scripts/featurize.sh
     deps:
@@ -17,7 +18,8 @@ stages:
     params:
     - featurize.max_features
     outs:
-    - data/features
+    - data/features:
+        cache: false
   train:
     cmd: ./src/scripts/train.sh
     deps:
@@ -28,7 +30,8 @@ stages:
     - train.l2
     - train.seed
     outs:
-    - data/models
+    - data/models:
+        cache: false
   evaluate:
     cmd: ./src/scripts/evaluate.sh
     deps:
@@ -42,7 +45,8 @@ stages:
     - evaluation/plots/metrics/roc_auc.tsv:
         cache: false
     plots:
-    - evaluation/importance.png
+    - evaluation/importance.png:
+        cache: false
     - evaluation/plots/sklearn/confusion_matrix.json:
         cache: false
         template: confusion
