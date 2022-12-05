@@ -42,14 +42,18 @@ jobs:
           aws-region: us-east-1
       - name: repro_exp
         run:
-          poetry run dvc pull --run-cache && 
-          poetry run dvc repro && 
+          poetry run dvc pull
+          
+          poetry run dvc repro
 
-          echo "## Metrics" >> report.md && 
-          git fetch --prune && 
-          poetry run dvc metrics diff --show-md >> report.md && 
+          echo "## Metrics" >> report.md
+          
+          git fetch --prune
+          
+          poetry run dvc metrics diff --show-md >> report.md
 
-          echo -e "## Plots\n### ROC Curve" >> report.md && 
+          echo -e "## Plots\n### ROC Curve" >> report.md
+          
           poetry run dvc plots show >> report.md
       
     
