@@ -31,7 +31,7 @@ jobs:
         with:
           black_args: ". --check"
       - name: Lint
-        run: python ./lint.py --path ./src
+        run: poetry run python ./lint.py --path ./src
       - name: Test
         run: poetry run pytest src/test
       - name: Set AWS credentials
