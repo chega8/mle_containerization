@@ -21,7 +21,7 @@ jobs:
           
       - name: Install dependencies
         run:
-          apt-get -qq update && apt-get -qq install -y --no-install-recommends git
+          sudo apt-get -qq update && sudo apt-get -qq install -y --no-install-recommends git
           pip install -r requirements.txt --quiet
 
       - uses: rickstaa/action-black@v1
