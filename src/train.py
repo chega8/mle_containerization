@@ -8,24 +8,41 @@ import sys
 import yaml
 
 import numpy as np
+import pandas as pd
 
 from loguru import logger
 from sklearn import metrics, model_selection
 
 from sklearn.linear_model import LogisticRegression
 
+import mlflow
+
 sys.path.append("./")
 
 from src.utils import format_time, load_pickle, save_model
+from src.models.models import Logreg, SVM, GB
 
 
 params = yaml.safe_load(open("params.yaml"))["train"]
 
-l2 = params["l2"]
-l1 = params["l1"]
+model_type = params["model"]
+
 random.seed(params["seed"])
 
 N_FOLDS = 5
+
+
+def gridsearch_train(features: np.ndarray, target: np.ndarray):
+    """Grid search"""
+
+    models = {
+        "logreg": Logreg(),
+        "svm": SVM(),
+        "gb": GB(),
+    }
+
+    model = models[model_type].train(features, target)
+    return model
 
 
 def crossval_train(features: np.ndarray, target: np.ndarray):
@@ -60,18 +77,28 @@ def train(features_path: str):
     Args:
         features_path (str): path to features
     """
-    features = load_pickle(os.path.join(features_path, "train.pkl"))
-    target = load_pickle(os.path.join(features_path, "train_target.pkl"))
-
+    features = load_pickle(os.path.join(features_path, "train.pkl"))[:1000]
+    target = load_pickle(os.path.join(features_path, "train_target.pkl"))[:1000]
     logger.info(f"Features loaded from {features_path}")
 
-    start = time.time()
-    model = crossval_train(features, target)
-    logger.info(f"TOTAL TIME: {format_time(time.time() - start)}")
+    model = gridsearch_train(features, target)
 
     os.makedirs("data/models", exist_ok=True)
-    save_model(model, "logreg")
+    save_model(model, "model")
     logger.info("Model saved")
+
+    # start = time.time()
+
+    # mlflow.start_run()
+    # model = logreg_train(features, target)
+    # mlflow.log_param("l1", l1)
+    # mlflow.log_param("l2", l2)
+
+    # logger.info(f"TOTAL TIME: {format_time(time.time() - start)}")
+
+    # os.makedirs("data/models", exist_ok=True)
+    # save_model(model, "logreg")
+    # logger.info("Model saved")
 
 
 if __name__ == "__main__":

@@ -12,7 +12,6 @@ stages:
     params:
       params.yaml:
         prepare.seed: 20170428
-        prepare.split: 0.2
     outs:
     - path: data/prepared
       md5: 5e6d4a54eb20f3f36ccd04dd8c4079ef.dir
@@ -44,16 +43,15 @@ stages:
       size: 82006002
       nfiles: 5
     - path: src/train.py
-      md5: dc7cbd484e3a3a42fe53e41159b75d72
-      size: 2133
+      md5: ec98f02dda339ddbf540e200686c1e47
+      size: 2758
     params:
       params.yaml:
-        train.l1: 0.01
-        train.l2: 0.01
+        train.model: logreg
         train.seed: 421
     outs:
     - path: data/models
-      md5: 3d18b0202b248293f4ab13bcb77c98ad.dir
+      md5: d6cb58dcbb80ce241785ab3acbe81e47.dir
       size: 2335
       nfiles: 1
   evaluate:
@@ -63,28 +61,25 @@ stages:
       md5: 555a31e38707f1ba6b634db34a739947.dir
       size: 82006002
       nfiles: 5
-    - path: data/models/logreg.pkl
-      md5: 0fca618deaa63a7723e7f7ea765c8e16
+    - path: data/models/model.pkl
+      md5: 66e50fe5276a8beb26f759ef4c74ac7a
       size: 2335
     - path: src/evaluate.py
-      md5: 001ef6a45095a7e06918c0ab6a79f1e0
-      size: 1862
+      md5: c1316442dbb258cf724fb1bbd1beeb9b
+      size: 2008
     outs:
-    - path: evaluation/importance.png
-      md5: a0c41b13b548915ff0395c2367b5f505
-      size: 22660
     - path: evaluation/plots/metrics/avg_prec.tsv
-      md5: 33512c3e9f1a10cba53d50c234e802fb
+      md5: d2dc1a7fa5d86facf0a67b58b83503af
       size: 35
     - path: evaluation/plots/metrics/roc_auc.tsv
-      md5: 8436eb765341bf4011e28acabf6e1f56
+      md5: c659bb1bc87085c08ff59c17bc294027
       size: 34
     - path: evaluation/plots/sklearn/confusion_matrix.json
-      md5: 3f4333b22eb3b480a3dadd42049aa8b3
+      md5: b8262218d24502b3ce6b250b0714b0e2
       size: 1260002
     - path: evaluation/plots/sklearn/precision_recall.json
-      md5: 2cfbeae8542517cfe556589728516666
-      size: 3041481
+      md5: 13b14879ebdf5dcbc5e69b3089229327
+      size: 3044117
     - path: evaluation/plots/sklearn/roc.json
-      md5: bdb61f93e63b98870d62f7ee3d0a8753
-      size: 958880
+      md5: 724fdf6ad00b8504c4db1f058429bf70
+      size: 1160294

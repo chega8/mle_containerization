@@ -2,6 +2,7 @@
 
 env/
 models/
+mlruns/
 static
 evaluation
 dvc_plots

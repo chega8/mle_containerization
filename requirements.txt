@@ -11,3 +11,4 @@ black[jupyter]
 pytest
 pylint
 matplotlib
+mlflow
