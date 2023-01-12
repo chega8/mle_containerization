@@ -87,19 +87,6 @@ def train(features_path: str):
     save_model(model, "model")
     logger.info("Model saved")
 
-    # start = time.time()
-
-    # mlflow.start_run()
-    # model = logreg_train(features, target)
-    # mlflow.log_param("l1", l1)
-    # mlflow.log_param("l2", l2)
-
-    # logger.info(f"TOTAL TIME: {format_time(time.time() - start)}")
-
-    # os.makedirs("data/models", exist_ok=True)
-    # save_model(model, "logreg")
-    # logger.info("Model saved")
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

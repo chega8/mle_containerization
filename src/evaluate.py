@@ -16,10 +16,6 @@ from src.utils import load_pickle
 
 live = Live("evaluation")
 
-# def log_search_params(search_results):
-#     params = search_results.cv_results_['params']
-#     scores = search_results.cv_results_['mean_test_score']
-
 
 def evaluate(model_path: str, features_path: str):
     """Evaluate model
