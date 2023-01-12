@@ -2,15 +2,9 @@
 import argparse
 import os
 import sys
-import yaml
-import random
-
-import pandas as pd
 
 from sklearn import metrics
 import mlflow
-
-import matplotlib.pyplot as plt
 
 from dvclive import Live
 
