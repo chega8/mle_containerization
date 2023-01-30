@@ -4,6 +4,7 @@ import os
 import sys
 
 from sklearn import metrics
+from loguru import logger
 import mlflow
 
 from dvclive import Live
@@ -24,6 +25,7 @@ def evaluate(model_path: str, features_path: str):
         model_path (str): path to model
         features_path (str): path to test featuers
     """
+    logger.info("Start evaluation")
 
     features = load_pickle(os.path.join(features_path, "test.pkl"))
     target = load_pickle(os.path.join(features_path, "test_target.pkl"))
@@ -49,10 +51,12 @@ def evaluate(model_path: str, features_path: str):
         mlflow.log_metric("roc auc", auc)
 
         mlflow.sklearn.log_model(model, "model")
+        mlflow.log_artifact(model_path)
 
     live.log_sklearn_plot(
         "confusion_matrix", target.squeeze(), predictions_by_class.argmax(-1)
     )
+    logger.info("Metrics saved")
 
 
 if __name__ == "__main__":

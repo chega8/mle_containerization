@@ -1,15 +1,12 @@
-FROM python:3.6-stretch
+FROM python:3.8.3
 
-RUN  apt-get update
+RUN apt-get update
+RUN pip install mlflow
 
-WORKDIR /home/logreg
+COPY . /app
+WORKDIR /app
 
-COPY ./src /home/logreg/src
-COPY ./volume /home/logreg/volume
-COPY ./requirements.txt /home/logreg/requirements.txt
-COPY ./params.yaml /home/logreg/params.yaml
-
-RUN pip install -r requirements.txt
+RUN pip install -r build/requirements.txt
 RUN chmod +x -R src/
 
-CMD bash
+CMD ./src/scripts/run_pipeline.sh
