@@ -23,16 +23,7 @@ from src.utils import format_time, load_pickle, save_model
 from src.models.models import Logreg, SVM, GB
 
 
-params = yaml.safe_load(open("params.yaml"))["train"]
-
-model_type = params["model"]
-
-random.seed(params["seed"])
-
-N_FOLDS = 5
-
-
-def gridsearch_train(features: np.ndarray, target: np.ndarray):
+def gridsearch_train(features: np.ndarray, target: np.ndarray, model_type: str):
     """Grid search"""
 
     models = {
@@ -41,7 +32,7 @@ def gridsearch_train(features: np.ndarray, target: np.ndarray):
         "gb": GB(),
     }
 
-    model = models[model_type].train(features, target)
+    model = models.get(model_type, "logreg").train(features, target)
     return model
 
 
@@ -71,21 +62,15 @@ def crossval_train(features: np.ndarray, target: np.ndarray):
     return clf
 
 
-def train(features_path: str):
+def train(features: np.ndarray, target: np.ndarray, model_type: str):
     """Train the model on features
 
     Args:
         features_path (str): path to features
     """
-    features = load_pickle(os.path.join(features_path, "train.pkl"))[:1000]
-    target = load_pickle(os.path.join(features_path, "train_target.pkl"))[:1000]
-    logger.info(f"Features loaded from {features_path}")
 
-    model = gridsearch_train(features, target)
-
-    os.makedirs("data/models", exist_ok=True)
-    save_model(model, "model")
-    logger.info("Model saved")
+    model = gridsearch_train(features, target, model_type)
+    return model
 
 
 if __name__ == "__main__":
@@ -93,4 +78,16 @@ if __name__ == "__main__":
     parser.add_argument("features_path", type=str, help="path to features")
     args = parser.parse_args()
 
-    train(args.features_path)
+    params = yaml.safe_load(open("params.yaml"))["train"]
+    model_type = params["model"]
+    random.seed(params["seed"])
+
+    features = load_pickle(os.path.join(args.features_path, "train.pkl"))[:1000]
+    target = load_pickle(os.path.join(args.features_path, "train_target.pkl"))[:1000]
+    logger.info(f"Features loaded from {args.features_path}")
+
+    model = train(features, target, model_type)
+
+    os.makedirs("data/models", exist_ok=True)
+    save_model(model, "model")
+    logger.info("Model saved")
