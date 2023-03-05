@@ -1,13 +1,15 @@
 !.gitkeep
 
-env/
+mle_env/
 models/
+mlruns/*
 static
 evaluation
 dvc_plots
 
 __pycache__
 .ipynb_checkpoints/
+.pytest_cache/
 
 .idea
 .vscode

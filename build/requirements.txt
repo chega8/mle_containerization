@@ -3,12 +3,7 @@ pandas
 scikit-learn
 loguru
 pyyaml
-dvc[all]
-dvc[s3]
-dvclive==1.0.1
-black
-black[jupyter]
+dvclive
 pytest
-pylint
 matplotlib
 mlflow

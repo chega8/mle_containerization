@@ -7,6 +7,7 @@ import pickle
 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 from loguru import logger
 
@@ -144,3 +145,12 @@ def save_model(model, name):
 def load_model(name):
     """Load model"""
     return load_pickle(f"data/models/{name}.pkl")
+
+
+def plot_importance(importances):
+    fig, axes = plt.subplots(dpi=100)
+    fig.subplots_adjust(bottom=0.2, top=0.95)
+    forest_importances = pd.Series(importances).nlargest(n=30)
+    axes.set_ylabel("Mean decrease in impurity")
+    forest_importances.plot.bar(ax=axes)
+    fig.savefig(os.path.join("evaluation", "importance.png"))

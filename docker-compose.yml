@@ -1,15 +1,32 @@
 version: "3.7"
 
 services:
-  logreg:
-    build:
-      dockerfile: Dockerfile
-      context: ./
+  model:
+    build: .
+    environment:
+      MLFLOW_TRACKING_URI: "http://mlflow-server:5001"
 
-    container_name: logreg_cont
+    container_name: model_cont
     stdin_open: true
     tty: true
-    working_dir: /home/logreg
+    working_dir: /app
     volumes:
-      - ./data:/home/logreg/data/
-    
+      - ./data:/app/data/
+      - ./mlruns:/app/mlruns/
+      - ${PWD}/params.yaml:/app/params.yaml
+    networks:
+      - model
+  mlflow-server:
+    build: ./mlflow
+    image: mlflow_server
+    container_name: mlflow_server
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./mlruns:/app/mlruns/
+    networks:
+      - model
+
+networks:
+    model:
+        driver: bridge

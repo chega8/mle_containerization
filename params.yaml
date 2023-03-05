@@ -6,6 +6,6 @@ featurize:
   max_features: 204
 
 train:
+  model: logreg
   seed: 421
-  l2: 0.01
-  l1: 0.01
+  max_features: 20

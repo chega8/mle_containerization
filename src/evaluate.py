@@ -2,14 +2,10 @@
 import argparse
 import os
 import sys
-import json
-import math
-
-import pandas as pd
 
 from sklearn import metrics
-
-import matplotlib.pyplot as plt
+from loguru import logger
+import mlflow
 
 from dvclive import Live
 
@@ -17,6 +13,7 @@ from dvclive import Live
 sys.path.append("./")
 
 from src.utils import load_pickle
+
 
 live = Live("evaluation")
 
@@ -28,6 +25,7 @@ def evaluate(model_path: str, features_path: str):
         model_path (str): path to model
         features_path (str): path to test featuers
     """
+    logger.info("Start evaluation")
 
     features = load_pickle(os.path.join(features_path, "test.pkl"))
     target = load_pickle(os.path.join(features_path, "test_target.pkl"))
@@ -37,24 +35,28 @@ def evaluate(model_path: str, features_path: str):
     predictions_by_class = model.predict_proba(features)
     predictions = predictions_by_class[:, 1]
 
-    live.log_sklearn_plot("roc", target, predictions)
-    live.log_sklearn_plot("precision_recall", target, predictions)
-    live.log_metric("avg_prec", metrics.average_precision_score(target, predictions))
-    live.log_metric("roc_auc", metrics.roc_auc_score(target, predictions))
+    avg_prec = metrics.average_precision_score(target, predictions)
+    auc = metrics.roc_auc_score(target, predictions)
 
-    # ... confusion matrix plot
+    live.log_sklearn_plot("roc", target.tolist(), predictions.tolist())
+    live.log_sklearn_plot("precision_recall", target.tolist(), predictions.tolist())
+    live.log_metric("avg_prec", avg_prec)
+    live.log_metric("roc_auc", auc)
+
+    with mlflow.start_run():
+        params = {param: v for param, v in model.get_params().items() if v is not None}
+        mlflow.log_params(params)
+
+        mlflow.log_metric("average precision", avg_prec)
+        mlflow.log_metric("roc auc", auc)
+
+        mlflow.sklearn.log_model(model, "model")
+        mlflow.log_artifact(model_path)
+
     live.log_sklearn_plot(
         "confusion_matrix", target.squeeze(), predictions_by_class.argmax(-1)
     )
-
-    # ... and finally, we can dump an image, it's also supported:
-    fig, axes = plt.subplots(dpi=100)
-    fig.subplots_adjust(bottom=0.2, top=0.95)
-    importances = model.coef_[0]
-    forest_importances = pd.Series(importances).nlargest(n=30)
-    axes.set_ylabel("Mean decrease in impurity")
-    forest_importances.plot.bar(ax=axes)
-    fig.savefig(os.path.join("evaluation", "importance.png"))
+    logger.info("Metrics saved")
 
 
 if __name__ == "__main__":
