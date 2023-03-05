@@ -17,43 +17,48 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10' 
+          python-version: '3.9' 
           
-      - name: Install poetry
-        run: |
-          python -m pip install poetry
+      # - name: Install poetry
+      #   run: |
+      #     python -m pip install poetry
           
       - name: Install dependencies
         run: |
-          python -m poetry install
+          python -m pip install -r requirements.txt
+          
       - uses: rickstaa/action-black@v1
         with:
           black_args: ". --check"
+
       - name: Lint
-        run: poetry run python ./lint.py --path ./src
+        run: python ./lint.py --path ./src
+
       - name: Test
-        run: poetry run pytest src/test
+        run: pytest src/test
+
       - name: Set AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
+
       - name: repro_exp
         run:
-          poetry run dvc pull
+          dvc pull
           
-          poetry run dvc repro
+          dvc repro
 
           echo "## Metrics" >> report.md
           
           git fetch --prune
           
-          poetry run dvc metrics diff --show-md >> report.md
+          dvc metrics diff --show-md >> report.md
 
           echo -e "## Plots\n### ROC Curve" >> report.md
           
-          poetry run dvc plots show >> report.md
+          dvc plots show >> report.md
       
     
   # build:
