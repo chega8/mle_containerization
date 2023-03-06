@@ -1,7 +1,7 @@
 !.gitkeep
 
 mle_env/
-models/
+# models/
 mlruns/*
 static
 evaluation

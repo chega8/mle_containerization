@@ -2,39 +2,46 @@
 
 import sys
 import pytest
-from sklearn.preprocessing import StandardScaler
 import numpy as np
+import pandas as pd
 
 
-sys.path.append("./")
+sys.path.append(".")
 
-from src.featurize import read_prepared, scale_prepared
-
-
-@pytest.mark.skip
-def test_featurization():
-    """Test featurization"""
-
-    train_pth = "data/prepared/train.csv"
-    test_pth = "data/prepared/train.csv"
-    prepared_train, prepared_test = read_prepared(train_pth, test_pth)
-
-    features = ["f6", "f7", "f8", "f9", "f10", "f11", "f12", "f13", "f14"]
-
-    scaler = StandardScaler()
-    features, scaler = scale_prepared(prepared_train, scaler)
-    assert np.linalg.norm(features) == np.float32(4813.489)
-
-    features, scaler = scale_prepared(prepared_test, scaler, mode="test")
-    assert np.linalg.norm(features) == np.float32(4813.489)
-
-    features, scaler = scale_prepared(prepared_test, scaler, "none")
-    assert np.linalg.norm(features) == 282891213.48606616
+from src.prepare import prepare
+from src.featurize import fearurize
 
 
 def test_prepare():
     """Test prepare"""
-    assert True
+
+    sample = pd.read_csv("src/test/data/test_sample.csv")
+    train, test = prepare(sample, 0.2, 4)
+    assert train.shape == (80, 286)
+    assert test.shape == (20, 286)
+
+    train, test = prepare(sample, 0.3, 4)
+    assert train.shape == (70, 286)
+    assert test.shape == (30, 286)
+
+
+def test_featurize():
+    """Test prepare"""
+    sample = pd.read_csv("src/test/data/test_sample.csv")
+    train, test = sample.loc[:50], sample.loc[50:]
+
+    max_features = 100
+    train_f, test_f, train_target, test_target, _ = fearurize(train, test, max_features)
+    assert len(train_f) == len(train_target)
+    assert len(test_f) == len(test_target)
+
+    assert train_f.shape[1] == max_features
+    assert test_f.shape[1] == max_features
+
+    max_features = 60
+    train_f, test_f, train_target, test_target, _ = fearurize(train, test, max_features)
+    assert train_f.shape[1] == max_features
+    assert test_f.shape[1] == max_features
 
 
 def test_evaluate():
