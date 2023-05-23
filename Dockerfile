@@ -9,4 +9,5 @@ WORKDIR /app
 RUN pip install -r build/requirements.txt
 RUN chmod +x -R src/
 
-CMD ./src/scripts/run_pipeline.sh
+# CMD ./src/scripts/run_pipeline.sh
+CMD bash

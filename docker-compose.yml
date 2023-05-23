@@ -16,6 +16,7 @@ services:
       - ${PWD}/params.yaml:/app/params.yaml
     networks:
       - model
+      
   mlflow-server:
     build: ./mlflow
     image: mlflow_server
@@ -26,6 +27,44 @@ services:
       - ./mlruns:/app/mlruns/
     networks:
       - model
+
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5432:5432"
+
+  airflow:
+    build:
+      context: .
+      dockerfile: airflow/Dockerfile
+    depends_on:
+      - postgres
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./src:/opt/airflow/src
+      - /var/run/docker.sock:/var/run/docker.sock
+    container_name: airflow
+    stdin_open: true
+    tty: true
+    environment:
+    - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+    - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    - AIRFLOW__CORE__DB_UPGRADE=true
+    ports:
+      - "8080:8080"
+    command: bash -c "airflow db init && airflow scheduler & airflow webserver"
+
+  # docker-proxy:
+  #   image: bobrik/socat
+  #   command: "TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock"
+  #   ports:
+  #     - "2376:2375"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
     model:
